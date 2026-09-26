@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Los cristales de energía - Valle de la Multiplicación</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:14px;font-family:Arial,sans-serif;background:#eef5ef;color:#26372d}
+main{max-width:820px;margin:auto}.game{background:#f5f1dc;border:2px solid #b7c99d;border-radius:24px;padding:18px}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}h1{margin:0;color:#64452e;font-size:clamp(1.3rem,5vw,2rem)}
+.score{background:#fff;border-radius:999px;padding:9px 14px;font-weight:bold}.story,.challenge,.final{background:#fff;border-radius:18px;padding:15px;margin-top:13px}.story{line-height:1.5}
+.valley{background:linear-gradient(#def1ff,#e8efd5);border-radius:18px;padding:14px;margin-top:13px;text-align:center}.crystals{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin:12px 0}
+.crystal{width:52px;height:55px;display:grid;place-items:center;font-size:2rem;filter:grayscale(1);opacity:.45}.charged{filter:none;opacity:1}.round{text-align:center;font-weight:bold}
+.groups{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:14px 0}.group{background:#f3ead2;border:2px solid #d5ba7d;border-radius:14px;padding:9px;min-width:72px;text-align:center;font-size:1.55rem}
+.eq{text-align:center;font-size:clamp(1.9rem,7vw,2.7rem);font-weight:900;color:#64452e}.sum{text-align:center;color:#59665d;margin:5px}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}button{min-height:50px;border:2px solid #d2bf98;border-radius:14px;background:#fff;font-size:1.15rem;font-weight:bold;cursor:pointer}
+button:focus{outline:3px solid #35669a;outline-offset:2px}.msg{text-align:center;min-height:32px;margin:10px;font-weight:bold}.next{display:none;margin:10px auto 0;background:#64452e;color:#fff;border:0;padding:10px 18px}
+.final{display:none;text-align:center}.restart{background:#43845a;color:#fff;border:0;padding:10px 18px}.big{font-size:3.5rem}
+@media(max-width:430px){body{padding:7px}.game{padding:11px}.choices{grid-template-columns:1fr 1fr}.crystal{width:42px}}
+</style></head>
+<body><main><section class="game">
+<div class="top"><h1>💎 Nivel 3 · Misión 2: Los cristales de energía</h1><div class="score">⚡ Cristales: <span id="score">0</span>/8</div></div>
+<div class="story">La energía del <strong>Valle de la Multiplicación</strong> se está agotando. Para recuperarla debes activar <strong>8 cristales mágicos</strong>. Observa los grupos iguales, usa la suma repetida y resuelve cada multiplicación. ¡Cada respuesta correcta cargará un cristal!</div>
+<section class="valley"><div style="font-size:2rem">🌳 ⛰️ ✨ 🌈 ✨ ⛰️ 🌳</div><div class="crystals" id="crystals"></div><strong>¡Activa todos los cristales de energía!</strong></section>
+<section class="challenge" id="challenge"><div class="round" id="round"></div><div class="groups" id="groups"></div><div class="sum" id="sum"></div><div class="eq" id="eq"></div><div class="choices" id="choices"></div><div class="msg" id="msg" aria-live="polite"></div><button type="button" class="next" id="next">➡️ Siguiente cristal</button></section>
+<section class="final" id="final"><div class="big">💎⚡✨🏆✨⚡💎</div><h2>¡Energía restaurada!</h2><p>Activaste los 8 cristales y devolviste la energía al valle.</p><p><strong>🏅 Recompensa: Cristal de la Multiplicación</strong></p><p>⭐ ¡Misión 2 completada!</p><button type="button" class="restart" id="restart">🔄 Jugar otra vez</button></section>
+</section></main>
+<script>
+const R=[
+ [2,3,'⭐',[5,6,7]],[3,2,'🍎',[4,6,8]],[4,2,'💎',[6,8,10]],[3,3,'🌸',[7,9,11]],
+ [5,2,'🪙',[8,10,12]],[4,3,'🍄',[10,12,14]],[5,3,'⭐',[12,15,18]],[4,4,'💎',[14,16,18]]
+];
+let i=0,score=0,locked=false;const E=x=>document.getElementById(x);
+function drawCrystals(){E('crystals').innerHTML='';for(let n=0;n<8;n++){let d=document.createElement('div');d.className='crystal'+(n<score?' charged':'');d.textContent=n<score?'💎':'🔹';E('crystals').appendChild(d)}}
+function render(){locked=false;let r=R[i];E('round').textContent='Cristal '+(i+1)+' de 8 · ¿Cuántos objetos hay en total?';E('groups').innerHTML='';for(let g=0;g<r[0];g++){let d=document.createElement('div');d.className='group';d.textContent=Array(r[1]).fill(r[2]).join('');E('groups').appendChild(d)}
+E('sum').textContent='Suma repetida: '+Array(r[0]).fill(r[1]).join(' + ');E('eq').textContent=r[0]+' × '+r[1]+' = ?';E('choices').innerHTML='';E('msg').textContent='';E('next').style.display='none';
+r[3].forEach(v=>{let b=document.createElement('button');b.type='button';b.textContent=v;b.addEventListener('click',()=>check(v));E('choices').appendChild(b)});drawCrystals()}
+function check(v){if(locked)return;let r=R[i];if(v===r[0]*r[1]){locked=true;score++;E('score').textContent=score;E('msg').textContent='⚡ ¡Correcto! El cristal recibió energía.';E('msg').style.color='#43845a';[...E('choices').children].forEach(b=>b.disabled=true);drawCrystals();E('next').textContent=i===7?'✨ Restaurar la energía':'➡️ Buscar el siguiente cristal';E('next').style.display='block'}else{E('msg').textContent='💡 Observa los grupos y usa la suma repetida. ¡Inténtalo otra vez!';E('msg').style.color='#ad5149'}}
+E('next').addEventListener('click',()=>{if(i<7){i++;render()}else{E('challenge').style.display='none';E('final').style.display='block'}});
+E('restart').addEventListener('click',()=>{i=0;score=0;E('score').textContent='0';E('challenge').style.display='block';E('final').style.display='none';render()});render();
+</script></body></html>
